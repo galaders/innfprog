@@ -143,10 +143,15 @@
     <script>
       //PREPARE GAME CONFIG AND VARIABLES
       const canvas = document.getElementById("anim-area")
+<<<<<<< Updated upstream
 
       canvas.width = 800
       canvas.height = 600
 
+=======
+      canvas.width = 800
+      canvas.height = 600
+>>>>>>> Stashed changes
       const ctx = canvas.getContext("2d")
 
       // Config-objekt
@@ -156,7 +161,11 @@
         points: 4000,
         duration: 30,
         gamePaused: false,
+<<<<<<< Updated upstream
         pauseText: "Press P to pause"
+=======
+        pauseText: "Press P to pause", 
+>>>>>>> Stashed changes
       }
 
       console.log(gameConfig)
@@ -169,6 +178,7 @@
         arrays: 7,
       }
 
+<<<<<<< Updated upstream
       //Fortran konfigurasjon
       const fortran = {
         speed: 1,
@@ -177,6 +187,17 @@
       }
 
       const itemTypes = ["variables", "arrays", "loops", "functions", "energydrinks", "bugs"]
+=======
+
+      //fortran konfigurasjon
+      const fortran = {
+        speed: 1,
+        x: canvas.width /2,
+        y: canvas.height /2
+      }
+
+       const itemTypes = [  "variable", "functions", "loop", "array", "bug", "energydrink"]
+>>>>>>> Stashed changes
 
       function updateStaticUI() {
         // Print playerinfo to HTML
@@ -237,6 +258,7 @@
         } else if (event.code === "KeyI") {
           toggleVisibility("info")
         } else if (event.code === "KeyP"){
+<<<<<<< Updated upstream
           // gameConfig.gamePaused === true 
           // ? gameConfig.gamePaused = false 
           // : gameConfig.gamePaused === false
@@ -244,6 +266,15 @@
           // : null
 
           gameConfig.gamePaused = !gameConfig.gamePaused
+=======
+         // gameConfig.gamePaused === true
+         // ? gameConfig.gamePaused = false
+         // : gameConfig.gamePaused === false
+         // ? gameConfig.gamePaused = true
+         // : null
+
+         gameConfig.gamePaused = !gameConfig.gamePaused
+>>>>>>> Stashed changes
         }
       })
 
@@ -270,20 +301,33 @@
 
       function updateConfigValue(obj, configType, value) {
         console.log(configType)
+<<<<<<< Updated upstream
         obj === notebook ? notebook[configType] += value : obj === gameConfig ? gameConfig[configType] += value : null
+=======
+        obj === "notebook" ? notebook[configType] += value : obj === "gameConfig" ? gameConfig[configType] += value : null
+>>>>>>> Stashed changes
 
         updateStaticUI()
       }
 
+<<<<<<< Updated upstream
       updateConfigValue(notebook, "variables", 10)
       updateConfigValue(notebook, "arrays", 40)
       updateConfigValue(gameConfig, "energy", 100)
 
+=======
+      updateConfigValue("notebook", "variables", 10)
+      updateConfigValue("notebook", "arrays", 40)
+      updateConfigValue("gameConfig", "energy", 100)
+
+     
+>>>>>>> Stashed changes
 
 
       let fortranLoaded = false
       let fortranImage = new Image()
       fortranImage.src = "icons/fortran.png"
+<<<<<<< Updated upstream
       fortranImage.onload = () => { 
         fortranLoaded = true 
       }
@@ -314,17 +358,40 @@
       function drawElements() {
         // ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+=======
+      fortranImage.onload = () => {
+        fortranLoaded = true
+      }
+
+      function drawItem(){
+        let itemImage = new Image()
+        itemImage.src = "icons/array.svg"
+        itemImage.onload = () => {
+          ctx.drawImage(itemImage, canvas.width / 2, canvas.height / 2 )
+        }
+      }
+
+      drawItem()
+
+      function drawElements(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+>>>>>>> Stashed changes
         if(fortranLoaded = true){
           ctx.drawImage(fortranImage, fortran.x, fortran.y)
         }
 
+<<<<<<< Updated upstream
         if(gameConfig.gamePaused === true){
+=======
+        if (gameConfig.gamePaused === true){
+>>>>>>> Stashed changes
           ctx.beginPath()
           ctx.fillStyle = "red"
           ctx.font = "3rem Arial"
           ctx.fillText("PAUSED", canvas.width / 2 - 100, canvas.height / 2)
           ctx.closePath()
 
+<<<<<<< Updated upstream
           gameConfig.pauseText = "Press P to unpause"
         } else {
           gameConfig.pauseText = "Press P to pause"
@@ -341,11 +408,29 @@
           drawItem("function", 130, 150)
           drawItem("bug", 500, 500)
 
+=======
+          gameConfig.pauseText = "press P to unpause"
+        } else {
+          gameConfig.pauseText = "press P to pause"
+        }
+    
+     ctx.beginPath()
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(canvas.width - 150, canvas.height - 25, 150, 25)
+      ctx.fillStyle = "#3c429b"
+      ctx.font = "16px Arial"
+      ctx.fillText(gameConfig.pauseText, canvas.width - 143, canvas.height - 10)
+      ctx.closePath()
+>>>>>>> Stashed changes
 
         requestAnimationFrame(drawElements)
       }
 
       drawElements()
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     </script>
   </body>
 </html>
