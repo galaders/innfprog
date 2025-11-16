@@ -152,7 +152,7 @@
       // Config-objekt
       const gameConfig = {
         playerName: "Thor",
-        energy: 10,
+        energy: 1,
         points: 0,
         duration: 0,
         gamePaused: false,
@@ -183,14 +183,14 @@
         right: false
       }
 
-      const itemTypes = ["variable", "array", "loop", "function", "energydrink", "bug"]
+      const itemTypes = ["variable", "bug", "array", "loop", "function", "energydrink" ]
 
       //type, x, y, lifetime, collected
       const items = [
-        //{ type: "variable", x: 500, y: 40, lifetime: 10, collected: false },
-        //{ type: "array", x: 450, y: 200, lifetime: 15, collected: false },
-        //{ type: "loop", x: 200, y: 100, lifetime: 30, collected: false },
-        //{ type: "bug", x: 300, y: canvas.height - 50, lifetime: 0, collected: false }
+        // { type: "variable", x: 500, y: 40, lifetime: 10, collected: false },
+        // { type: "array", x: 450, y: 200, lifetime: 15, collected: false },
+        // { type: "loop", x: 200, y: 100, lifetime: 30, collected: false },
+        // { type: "bug", x: 300, y: canvas.height - 50, lifetime: 0, collected: false }
       ]
 
       function randomMinMax(min, max){
@@ -198,29 +198,32 @@
       }
 
       function createElements(){
+        if(!gameConfig.gamePaused){
 
         const elementType = itemTypes[randomMinMax(0, itemTypes.length)]
 
-
         if(elementType === "bug"){
-             items.push(
-            {type: "bug", x: randomMinMax(10, canvas.width - 10), y: canvas.height + 50, lifetime: 0, collected: false })
-      } else {
-        items.push({
+        items.push({ 
+        type: "bug", 
+        x: randomMinMax(10, canvas.width - 10),
+        y: canvas.height + 50,
+        lifetime: 0,
+        collected: false
+          })
+        } else {
+          items.push({
             type: elementType,
             x: randomMinMax(10, canvas.width - 10),
             y: randomMinMax(10, canvas.height - 10),
             lifetime: randomMinMax(5, 15),
             collected: false
         })
-      }
-      setTimeout(createElements, randomMinMax(500,3000))
-
-      console.log(items)
+        }
+        }
+            setTimeout(createElements, randomMinMax(500, 3000))
         }
 
         createElements()
-        
 
       function updateStaticUI() {
         // Print playerinfo to HTML
@@ -351,7 +354,7 @@
       fortranImage.onload = () => {
         fortranLoaded = true
         console.log(fortranImage.width)
-        console.log("Fortran image loaded") 
+        console.log("Fortran image loaded")
       }
 
       function drawItem(type, x, y, lifetime) {
@@ -392,16 +395,27 @@
       function drawElements() {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+        if(gameConfig.energy <= 0){
+          ctx.beginPath()
+          ctx.font = "100px Arial"
+          ctx.fillStyle = "red"
+          ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2)
+          ctx.closePath()
+        } else {
+
+
         directions.up ? fortran.y -= fortran.speed : null
         directions.down ? fortran.y += fortran.speed : null
         directions.left ? fortran.x -= fortran.speed : null
         directions.right ? fortran.x += fortran.speed : null
 
         if(
+          //Betingelser
         fortran.x > canvas.width - (fortranImage.width / 2) ||
         fortran.x + fortranImage.width / 2 < 0 ||
         fortran.y + fortranImage.height / 2 < 0 ||
         fortran.y > canvas.height - (fortranImage.height / 2)){
+          //Utfall
           fortran.x = canvas.width / 2
           fortran.y = canvas.height / 2
           gameConfig.energy--
@@ -433,69 +447,72 @@
           ctx.closePath()
 
           items.filter((item) => item.lifetime > 0 && item.collected === false || item.type === "bug").map((item, index) => {
+            // Hvis item.type er "bug" skal den bevege seg oppover skjermen
             if(item.type === "bug"){
-                item.y -= 3
-                if(item.y < 0){
-                  items.splice(index, 1)
-                }
+              item.y -= 3
+              // Hvis bug er utenfor spillområdet..
+              if(item.y < 0){
+                //.. skal den fjernes fra arrayen
+                items.splice(index, 1)
+              }
             }
+              
+              //Kollisjonsdeteksjon
+              if(fortran.x + 20 > item.x && fortran.x < item.x + 20 && fortran.y + 20 > item.y && fortran.y < item.y + 20){
+                if(item.type === "bug" && item.collected === false){
+                  item.collected = true
+                  items.splice(index, 1)
+                  gameConfig.energy--
+                  updateSingleStaticUI("energy", gameConfig.energy)
+                }
+                if(item.type === "variable" && item.collected === false){
+                  notebook.variables++
+                  gameConfig.points += 1
+                  updateSingleStaticUI("points", gameConfig.points)
+                  item.collected = true
+                  updateSingleStaticUI("variables", notebook.variables)
+                }
+                if(item.type === "loop" && item.collected === false) {
+                  notebook.loops++
+                  item.collected = true
+                  updateSingleStaticUI("loops", notebook.loops)
+                  gameConfig.points += 2
+                  updateSingleStaticUI("points", gameConfig.points)
+                }
+                //Med ternary operator
+                // item.type === "functions" && item.collected === false ? notebook.functions++ && item.collected = true && updateSingleStaticUI("functions", notebook.functions) : null
 
-                if(fortran.x + 20 > item.x && fortran.x < item.x + 10 && fortran.y + 20 > item.y && fortran.y < item.y +10){
-                  if(item.type === "bug" && item.collected === false){
-                    item.collected = true
-                    item.splice(index, 1)
-                    gameConfig.energy--
-                    updateSingleStaticUI("energy", gameConfig.energy)
-                  }
-                  if(item.type === "variable" && item.collected === false){
-                    notebook.variables++
-                    item.collected = true
-                    updateSingleStaticUI("variables", notebook.variables)
-                    gameConfig.points += 1
-                    updateSingleStaticUI("points", gameConfig.points)
-                  }
-                  if(item.type === "loop" && item.collected === false){
-                    notebook.loops++
-                    item.collected = true
-                    updateSingleStaticUI("loops", notebook.variables)
-                    gameConfig.points += 2
-                    updateSingleStaticUI("points", gameConfig.points)
-                  }
-                  //item.type === "functions" && item.collected === false ? notebook.functions++ &&
-                 // updateSingleStaticUI("functions", notebook.functions) : null
-
-                 if(item.type === "function" && item.collected === false){
-                    notebook.functions++
-                    item.collected = true
-                    updateSingleStaticUI("functions", notebook.functions)
-                    gameConfig.points += 5
-                    updateSingleStaticUI("points", gameConfig.points)
-                 }
-
-                  if(item.type === "array" && item.collected === false){
-                    notebook.arrays++
-                    item.collected = true
-                    updateSingleStaticUI("arrays", notebook.variables)
-                    gameConfig.points += 8
-                    updateSingleStaticUI("points", gameConfig.points)
-                  }
-
-                   if(item.type === "energydrink" && item.collected === false){
-                    notebook.energy++
-                    item.collected = true
-                    updateSingleStaticUI("energy", notebook.variables)
-                  }
-
-
-
-                  
+                if(item.type === "function" && item.collected === false){
+                  notebook.functions++
+                  item.collected = true
+                  updateSingleStaticUI("functions", notebook.functions)
+                  gameConfig.points += 5
+                  updateSingleStaticUI("points", gameConfig.points)
                 }
 
+                if(item.type === "array" && item.collected === false){
+                  notebook.arrays++
+                  item.collected = true
+                  updateSingleStaticUI("arrays", notebook.arrays)
+                  gameConfig.points += 4
+                  updateSingleStaticUI("points", gameConfig.points)
+                }
+
+                if(item.type === "energydrink" && item.collected === false){
+                  gameConfig.energy++
+                  item.collected = true
+                  updateSingleStaticUI("energy", gameConfig.energy)
+                }
+
+
+              }
+              
 
             drawItem(item.type, item.x, item.y, item.lifetime)
           })
 
         requestAnimationFrame(drawElements)
+        }
       }
 
       drawElements()
